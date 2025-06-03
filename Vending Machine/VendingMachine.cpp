@@ -25,17 +25,17 @@ std::vector<sDrink> makeDefaultSet() {
     return items;
 };
 
-enum class status
+enum class Status
 {
 	INTRO, INVENTORY, MAIN_MODE, ADMIN_MODE, USER_MODE, INCOMING_INVENTORY, OUTGOING_INVENTORY, QUANTITY, ERROR, EXIT
 };
 
-status printProcess(status type, const std::vector<sDrink>& items) {
+Status printProcess(Status type, const std::vector<sDrink>& items) {
 	switch (type) {
-	case status::INTRO:
+	case Status::INTRO:
 		std::cout << "Welcome to the Vending Machine!" << std::endl;
 		break;
-	case status::INVENTORY:
+	case Status::INVENTORY:
         std::cout << std::endl;
         std::cout << "== 재고 현황 ==" << std::endl;
         std::cout << "번호 | name | price | ea  " << std::endl;
@@ -44,81 +44,78 @@ status printProcess(status type, const std::vector<sDrink>& items) {
         }
         std::cout << std::endl;
 		break;
-	case status::MAIN_MODE:
+	case Status::MAIN_MODE:
 		std::cout << "관리자모드 1, 사용자 모드 2, 종료 0" << std::endl;
 		break;
-	case status::ADMIN_MODE:
+	case Status::ADMIN_MODE:
 		std::cout << "- 입고 입력 1, 출고 입력 2, 나가기 0" << std::endl;
 		break;
-	case status::USER_MODE:
+	case Status::USER_MODE:
 		std::cout << "구매 음료 번호 : ";
 		break;
 
-    case status::INCOMING_INVENTORY:
+    case Status::INCOMING_INVENTORY:
         std::cout << "입고 음료 번호 : ";
         break;
-	case status::OUTGOING_INVENTORY:
+	case Status::OUTGOING_INVENTORY:
 		std::cout << "출고 음료 번호 : ";
 		break;
-	case status::QUANTITY:
+	case Status::QUANTITY:
 		std::cout << "수량 : ";
 		break;
-    case status::ERROR:
+    case Status::ERROR:
         std::cout << "잘못된 입력입니다. 다시 시도하세요." << std::endl;
         break;
 
-	case status::EXIT:
+	case Status::EXIT:
 		std::cout << "종료 합니다." << std::endl;
 		break;
 	}
-
     return type;
 }
 
-unsigned int inputProcess(status type) {
+unsigned int inputProcess(Status type) {
     unsigned int input = 0;
     switch (type)
     {
-    case status::INTRO:
-    case status::INVENTORY:
-    case status::EXIT:
-        break;
-    case status::MAIN_MODE:
-	case status::ADMIN_MODE:
-	case status::USER_MODE:
-	case status::INCOMING_INVENTORY:
-	case status::OUTGOING_INVENTORY:
-	case status::QUANTITY:
+    case Status::MAIN_MODE:
+	case Status::ADMIN_MODE:
+	case Status::USER_MODE:
+	case Status::INCOMING_INVENTORY:
+	case Status::OUTGOING_INVENTORY:
+	case Status::QUANTITY:
 		std::cin >> input;
 		return input;
-		break;
-
     default:
+    //case Status::INTRO:
+    //case Status::INVENTORY:
+    //case Status::EXIT:
         break;
     }
+    return 0;
 }
 
-status logicProcess(std::pair<status, unsigned int> p, std::vector<sDrink>& items) {
+Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& items) {
     unsigned int ea = 0;
-    status type = p.first;
+    Status type = p.first;
     switch (type) {
-    case status::INTRO:
-        type = status::INVENTORY;
+    case Status::INTRO:
+        type = Status::INVENTORY;
         break;
-    case status::INVENTORY:
-        type = status::MAIN_MODE;
+    case Status::INVENTORY:
+        type = Status::MAIN_MODE;
         break;
-    case status::MAIN_MODE:
+    case Status::MAIN_MODE:
         switch (p.second) {
         case 1:
-            type = status::ADMIN_MODE;
+            type = Status::ADMIN_MODE;
             break;
         case 2:
-            type = status::USER_MODE;
+            type = Status::USER_MODE;
             break;
         case 0:
-            type = status::EXIT;
-            printProcess(status::EXIT, items);
+            type = Status::EXIT;
+            printProcess(Status::EXIT, items);
             break;
         default:
             std::cout << "잘못된 입력입니다. 다시 시도하세요." << std::endl;
@@ -126,16 +123,16 @@ status logicProcess(std::pair<status, unsigned int> p, std::vector<sDrink>& item
         }
         break;
 
-    case status::ADMIN_MODE:
+    case Status::ADMIN_MODE:
         switch (p.second) {
         case 1: // 입고
-            type = status::INCOMING_INVENTORY;
+            type = Status::INCOMING_INVENTORY;
             break;
         case 2: // 출고
-            type = status::OUTGOING_INVENTORY;
+            type = Status::OUTGOING_INVENTORY;
             break;
         case 0: // 나가기
-            type = status::MAIN_MODE;
+            type = Status::MAIN_MODE;
             break;
         default:
             std::cout << "잘못된 입력입니다. 다시 시도하세요." << std::endl;
@@ -143,41 +140,41 @@ status logicProcess(std::pair<status, unsigned int> p, std::vector<sDrink>& item
         }
         break;
 
-    case status::INCOMING_INVENTORY:
-        printProcess(status::QUANTITY, items);
-        ea = inputProcess(status::QUANTITY);
+    case Status::INCOMING_INVENTORY:
+        printProcess(Status::QUANTITY, items);
+        ea = inputProcess(Status::QUANTITY);
         for (int i = 0; i < items.size(); i++) {
             if (items[i].index == p.second) {
                 items[i].inventory = items[i].inventory + ea;
-                printProcess(status::INVENTORY, items);
+                printProcess(Status::INVENTORY, items);
                 break;
             }
         }
-        type = status::ADMIN_MODE;
+        type = Status::ADMIN_MODE;
         break;
 
-    case status::OUTGOING_INVENTORY:
-    case status::USER_MODE:
-        printProcess(status::QUANTITY, items);
-        ea = inputProcess(status::QUANTITY);
+    case Status::OUTGOING_INVENTORY:
+    case Status::USER_MODE:
+        printProcess(Status::QUANTITY, items);
+        ea = inputProcess(Status::QUANTITY);
         for (int i = 0; i < items.size(); i++) {
             if (items[i].index == p.second) {
                 int remain = items[i].inventory - ea;
                 bool bPossible = (remain > 0) ? true : false;
                 if (bPossible) {
                     items[i].inventory = remain;
-                    printProcess(status::INVENTORY, items);
+                    printProcess(Status::INVENTORY, items);
                 }
                 else {
-                    printProcess(status::ERROR, items);
+                    printProcess(Status::ERROR, items);
                     return type;
                 }
             }
         }
-        if(type == status::OUTGOING_INVENTORY)
-            type = status::ADMIN_MODE;
+        if(type == Status::OUTGOING_INVENTORY)
+            type = Status::ADMIN_MODE;
 		else
-            type = status::MAIN_MODE;
+            type = Status::MAIN_MODE;
         break;
     }
     return type;
@@ -187,14 +184,11 @@ status logicProcess(std::pair<status, unsigned int> p, std::vector<sDrink>& item
 
 int main()
 {
-
-    std::vector<sDrink> items;
-
     //기본 값 셋팅
-    items = makeDefaultSet();
+    auto items = makeDefaultSet();
 
-    auto type = status::INTRO;
-    std::pair<status, unsigned int> p = { type, 0 };
+    Status type = Status::INTRO;
+    std::pair<Status, unsigned int> p = { type, 0 };
 
     while (true)
     {
@@ -209,8 +203,9 @@ int main()
         type = logicProcess(p, items);
 
 		// 종료 상태 확인
-		if (type == status::EXIT) {
+		if (type == Status::EXIT) {
 			break;
 		}
     }
+    return 0;
 }
