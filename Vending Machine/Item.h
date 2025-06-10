@@ -14,7 +14,7 @@ public:
 		m_name = typeid(this).name();
 	};
 
-	std::string getname() {
+	std::string getname() const {
 		return m_name;
 	}
 protected:

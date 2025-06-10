@@ -10,18 +10,8 @@
 
 std::vector<sDrink> makeDefaultSet() {
     std::vector<sDrink> items;
-    sDrink item;
-    item.name = Cider();
-    item.price = 1000;
-    item.inventory = 10;
-	item.index = items.size() + 1;
-    items.push_back(item);
-
-    item.name = CocaCola();
-    item.price = 1200;
-    item.inventory = 20;
-    item.index = items.size() + 1;
-    items.push_back(item);
+    items.push_back({ Cider(), 1, 1000, 10 });
+    items.push_back({ CocaCola(), 2, 1200, 20 });
     return items;
 };
 
@@ -39,7 +29,7 @@ Status printProcess(Status type, const std::vector<sDrink>& items) {
         std::cout << std::endl;
         std::cout << "== 재고 현황 ==" << std::endl;
         std::cout << "번호 | name | price | ea  " << std::endl;
-        for (auto item : items) {
+        for (const auto& item : items) {
             std::cout << item.index << " " << item.name.getname() << " " << item.price << " " << item.inventory << std::endl;
         }
         std::cout << std::endl;
@@ -95,7 +85,7 @@ unsigned int inputProcess(Status type) {
     return 0;
 }
 
-Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& items) {
+Status logicProcess(const std::pair<Status, unsigned int>& p, std::vector<sDrink>& items) {
     unsigned int ea = 0;
     Status type = p.first;
     switch (type) {
@@ -117,8 +107,7 @@ Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& item
             type = Status::EXIT;
             printProcess(Status::EXIT, items);
             break;
-        default:
-            std::cout << "잘못된 입력입니다. 다시 시도하세요." << std::endl;
+        default: printProcess(Status::ERROR, items);
             break;
         }
         break;
@@ -134,8 +123,7 @@ Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& item
         case 0: // 나가기
             type = Status::MAIN_MODE;
             break;
-        default:
-            std::cout << "잘못된 입력입니다. 다시 시도하세요." << std::endl;
+        default: printProcess(Status::ERROR, items); 
             break;
         }
         break;
@@ -143,13 +131,13 @@ Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& item
     case Status::INCOMING_INVENTORY:
         printProcess(Status::QUANTITY, items);
         ea = inputProcess(Status::QUANTITY);
-        for (int i = 0; i < items.size(); i++) {
-            if (items[i].index == p.second) {
-                items[i].inventory = items[i].inventory + ea;
+        for(auto& item : items) {
+            if (item.index == p.second) {
+                item.inventory += ea;
                 printProcess(Status::INVENTORY, items);
                 break;
             }
-        }
+		}
         type = Status::ADMIN_MODE;
         break;
 
@@ -157,12 +145,11 @@ Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& item
     case Status::USER_MODE:
         printProcess(Status::QUANTITY, items);
         ea = inputProcess(Status::QUANTITY);
-        for (int i = 0; i < items.size(); i++) {
-            if (items[i].index == p.second) {
-                int remain = items[i].inventory - ea;
-                bool bPossible = (remain > 0) ? true : false;
-                if (bPossible) {
-                    items[i].inventory = remain;
+        for(auto& item : items) {
+            if (item.index == p.second) {
+                int remain = item.inventory - ea;
+                if (remain >= 0) {
+                    item.inventory = remain;
                     printProcess(Status::INVENTORY, items);
                 }
                 else {
@@ -170,7 +157,7 @@ Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& item
                     return type;
                 }
             }
-        }
+		}
         if(type == Status::OUTGOING_INVENTORY)
             type = Status::ADMIN_MODE;
 		else
@@ -179,8 +166,6 @@ Status logicProcess(std::pair<Status, unsigned int> p, std::vector<sDrink>& item
     }
     return type;
 }
-
-
 
 int main()
 {
