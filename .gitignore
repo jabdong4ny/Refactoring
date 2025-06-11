@@ -2,5 +2,4 @@
 Release/
 Debug/
 *.sln
-*.vcxproj
 *.vcxproj.*
