@@ -1,3 +1,5 @@
+[![MSBuild](https://github.com/jabdong4ny/Refactoring/actions/workflows/msbuild.yml/badge.svg)](https://github.com/jabdong4ny/Refactoring/actions/workflows/msbuild.yml)
+
 # VendingMachine
 
 C++로 구현된 간단한 자판기 시뮬레이션 프로그램입니다. 
