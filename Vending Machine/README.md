@@ -1,3 +1,4 @@
+![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
 # VendingMachine
 
 C++로 구현된 간단한 자판기 시뮬레이션 프로그램입니다. 
